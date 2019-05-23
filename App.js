@@ -8,8 +8,9 @@
 
 import React, { Component } from "react";
 import { StyleSheet, Text, View, Alert } from "react-native";
-import Avatar from "./Avatar";
 import Header from "./Header";
+import Avatar from "./Avatar";
+import Calendar from "./Calendar";
 
 type Props = {};
 export default class App extends Component<Props> {
@@ -26,6 +27,7 @@ export default class App extends Component<Props> {
           continue={this.continue}
         />
         <Avatar style={{ flex: 0 }} />
+        <Calendar />
       </View>
     );
   }
