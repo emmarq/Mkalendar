@@ -7,17 +7,24 @@
  */
 
 import React, { Component } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View, Alert } from "react-native";
 import Avatar from "./Avatar";
 import Header from "./Header";
 
 type Props = {};
 export default class App extends Component<Props> {
   state = { tutor: { name: "Emmanuel Márquez" } };
+  continue = () => {
+    Alert.alert("Error", "No ha escogido su horario de reserva.");
+  };
   render() {
     return (
       <View style={styles.container}>
-        <Header style={{ flex: 0 }} title={this.state.tutor.name} />
+        <Header
+          style={{ flex: 0 }}
+          title={this.state.tutor.name}
+          continue={this.continue}
+        />
         <Avatar style={{ flex: 0 }} />
       </View>
     );

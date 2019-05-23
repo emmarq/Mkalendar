@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { StyleSheet, Text, View, Image } from "react-native";
-
+import { primaryColor } from "./globals";
 type Props = {};
 export default class Avatar extends Component<Props> {
 	render() {
@@ -16,7 +16,7 @@ export default class Avatar extends Component<Props> {
 						width: 100,
 						height: 100,
 						borderRadius: 100,
-						borderColor: "#24c0b0",
+						borderColor: primaryColor,
 						borderWidth: 3
 					}}
 					source={{
