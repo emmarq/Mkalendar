@@ -1,4 +1,4 @@
-import { getMonthWeeks } from "../utils";
+import { getMonthWeeks } from "../src/utils";
 const moment = require("moment");
 
 it("builds an month representation as array of weeks", () => {
