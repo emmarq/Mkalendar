@@ -24,6 +24,7 @@ export default class Schedule extends Component<Props> {
 			<View style={{ ...this.props.style, width: width, padding: 10 }}>
 				<Week
 					style={{ flex: 0 }}
+					selectedDay={this.props.day}
 					week={this.props.week}
 					selectDay={this.props.selectDay}
 				/>

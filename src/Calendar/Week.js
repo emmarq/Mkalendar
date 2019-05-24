@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { StyleSheet, Text, View, TouchableHighlight } from "react-native";
 import { getMonthWeeks } from "../utils";
+import { primaryColor } from "../globals";
 const moment = require("moment");
 
 type Props = {};
@@ -12,6 +13,9 @@ export default class Week extends Component<Props> {
 		this.props.selectDay(date, this.props.week);
 	};
 	render() {
+		const selectedDay =
+			this.props.selectedDay &&
+			this.props.selectedDay.format("YYYY-MM-DD");
 		return (
 			<View
 				style={{
@@ -21,15 +25,26 @@ export default class Week extends Component<Props> {
 					flexDirection: "row"
 				}}
 			>
-				{this.props.week.days.map((day, i) => (
-					<Day key={i} date={day} selectDay={this.selectDay} />
-				))}
+				{this.props.week.days.map((day, i) => {
+					let selected = false;
+					if (selectedDay) {
+						selected = day.format("YYYY-MM-DD") === selectedDay;
+					}
+					return (
+						<Day
+							key={i}
+							date={day}
+							selectDay={this.selectDay}
+							selected={selected}
+						/>
+					);
+				})}
 			</View>
 		);
 	}
 }
 
-const Day = ({ date, selectDay }) => {
+const Day = ({ date, selectDay, selected }) => {
 	return (
 		<TouchableHighlight
 			style={{ flex: 1 }}
@@ -39,7 +54,7 @@ const Day = ({ date, selectDay }) => {
 				if (date) selectDay(date);
 			}}
 		>
-			<View>
+			<View style={selected ? styles.selectedDay : {}}>
 				<Text
 					style={
 						date && (date.day() === 0 || date.day() === 6)
@@ -71,5 +86,9 @@ const styles = StyleSheet.create({
 		fontSize: 16,
 		color: "#000000",
 		fontWeight: "bold"
+	},
+	selectedDay: {
+		borderBottomColor: primaryColor,
+		borderBottomWidth: 5
 	}
 });
