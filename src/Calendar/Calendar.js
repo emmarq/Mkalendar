@@ -30,7 +30,6 @@ export default class Calendar extends Component<Props> {
 		};
 		this.calendar = React.createRef();
 	}
-	reserveTime = time => {};
 	showDays = index => {
 		this.setState({
 			...this.state,
@@ -106,6 +105,8 @@ export default class Calendar extends Component<Props> {
 						week={this.state.selectedWeek}
 						day={this.state.selectedDay}
 						selectDay={this.selectDay}
+						reservedTime={this.props.reservedTime}
+						reserve={this.props.reserve}
 					/>
 				)}
 			</View>

@@ -1,6 +1,13 @@
 import React, { Component } from "react";
-import { StyleSheet, Text, View, Dimensions, FlatList } from "react-native";
-import { getMonthWeeks } from "../utils";
+import {
+	StyleSheet,
+	Text,
+	View,
+	Dimensions,
+	FlatList,
+	TouchableHighlight
+} from "react-native";
+import { getMonthWeeks, periods } from "../utils";
 import Week from "./Week";
 import { primaryColor } from "../globals";
 const moment = require("moment");
@@ -12,6 +19,7 @@ export default class Schedule extends Component<Props> {
 		super(props);
 	}
 	render() {
+		const formattedDay = this.props.day.format("YYYY-MM-DD");
 		return (
 			<View style={{ ...this.props.style, width: width, padding: 10 }}>
 				<Week
@@ -21,40 +29,34 @@ export default class Schedule extends Component<Props> {
 				/>
 				<DaySchedule
 					style={{ flex: 1 }}
-					day={this.props.day}
-					timesReserved={[]}
-					reserve={this.props.reserved}
+					day={formattedDay}
+					timesReserved={this.props.reservedTime[formattedDay] || []}
+					reserve={this.props.reserve}
 				/>
 			</View>
 		);
 	}
 }
 
-const periods = (function() {
-	const p = [];
-	for (let i = 0; i < 13; i++) {
-		p.push(`${i}:00 AM`);
-		p.push(`${i}:30 AM`);
-	}
-	for (let i = 1; i < 13; i++) {
-		p.push(`${i}:00 PM`);
-		p.push(`${i}:30 PM`);
-	}
-	return p;
-})();
-
-const DaySchedule = ({ reserve, timesReserved, style }) => {
+const DaySchedule = ({ reserve, day, timesReserved, style }) => {
+	const data = Object.keys(periods)
+		.map(i => parseInt(i))
+		.sort((a, b) => {
+			return a - b;
+		});
 	return (
 		<View style={{ ...style, backgroundColor: primaryColor }}>
 			<FlatList
-				data={periods}
-				keyExtractor={item => item}
+				extraData={timesReserved.join()}
+				data={data}
+				keyExtractor={item => item + ""}
 				renderItem={({ item }) => {
 					const reserved = timesReserved.indexOf(item) !== -1;
 					return (
 						<TimeUnit
+							day={day}
 							time={item}
-							reserved={false}
+							reserved={reserved}
 							reserve={reserve}
 						/>
 					);
@@ -64,20 +66,28 @@ const DaySchedule = ({ reserve, timesReserved, style }) => {
 	);
 };
 
-const TimeUnit = ({ time, reserved }) => {
+const TimeUnit = ({ day, time, reserved, reserve }) => {
 	return (
-		<View
-			style={{
-				flexDirection: "row",
-				justifyContent: "space-between",
-				padding: 10
+		<TouchableHighlight
+			activeOpacity={0.5}
+			underlayColor="transparent"
+			onPress={() => {
+				reserve(day, time);
 			}}
 		>
-			<Text style={styles.text}>{time}</Text>
-			<Text style={styles.text}>
-				{reserved ? "Reservado" : "Reservar"}
-			</Text>
-		</View>
+			<View
+				style={{
+					flexDirection: "row",
+					justifyContent: "space-between",
+					padding: 10
+				}}
+			>
+				<Text style={styles.text}>{periods[time]}</Text>
+				<Text style={styles.text}>
+					{reserved ? "Reservado" : "Reservar"}
+				</Text>
+			</View>
+		</TouchableHighlight>
 	);
 };
 

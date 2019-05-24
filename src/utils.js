@@ -22,3 +22,21 @@ export const getMonthWeeks = date => {
 
 	return weeks;
 };
+
+export const periods = (function() {
+	const p = {};
+	let id = 0;
+	for (let i = 0; i < 13; i++) {
+		p[id] = `${i}:00 AM`;
+		id++;
+		p[id] = `${i}:30 AM`;
+		id++;
+	}
+	for (let i = 1; i < 13; i++) {
+		p[id] = `${i}:00 PM`;
+		id++;
+		p[id] = `${i}:30 PM`;
+		id++;
+	}
+	return p;
+})();
