@@ -7,6 +7,7 @@ export default class Avatar extends Component<Props> {
 		return (
 			<View
 				style={{
+					...this.props.style,
 					alignItems: "center",
 					padding: 10
 				}}

@@ -15,6 +15,7 @@ export default class Header extends Component<Props> {
 		return (
 			<View
 				style={{
+					...this.props.style,
 					alignItems: "center",
 					padding: 15,
 					borderBottomWidth: 0.5,

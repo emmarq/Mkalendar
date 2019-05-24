@@ -19,7 +19,13 @@ export default class Month extends Component<Props> {
 		return (
 			<View style={{ width: width, padding: 10 }}>
 				{this.state.weeks.map(week => {
-					return <Week key={week.id} id={week.id} days={week.days} />;
+					return (
+						<Week
+							key={week.id}
+							week={week}
+							selectDay={this.props.selectDay}
+						/>
+					);
 				})}
 			</View>
 		);

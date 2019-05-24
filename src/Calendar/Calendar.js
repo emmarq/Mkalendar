@@ -4,11 +4,14 @@ import {
 	Text,
 	View,
 	FlatList,
-	TouchableHighlight
+	TouchableHighlight,
+	Dimensions
 } from "react-native";
 import Month from "./Month";
+import Schedule from "./Schedule";
 import Icon from "react-native-vector-icons/Entypo";
 const moment = require("moment");
+const { width } = Dimensions.get("window");
 
 type Props = {};
 export default class Calendar extends Component<Props> {
@@ -17,7 +20,9 @@ export default class Calendar extends Component<Props> {
 		const today = moment();
 		this.state = {
 			months: [today, moment(today).add(1, "months")],
-			selected: 0
+			selectedMonth: 0,
+			selectedWeek: null,
+			selectedDay: null
 		};
 		this.viewabilityConfig = {
 			waitForInteraction: true,
@@ -25,57 +30,93 @@ export default class Calendar extends Component<Props> {
 		};
 		this.calendar = React.createRef();
 	}
-	monthKeyExtractor = (item, id) => {
-		return item.format("MMMM YYYY");
+	reserveTime = time => {};
+	showDays = index => {
+		this.setState({
+			...this.state,
+			selectedMonth: index,
+			selectedWeek: null,
+			selectedDay: null
+		});
+	};
+	selectDay = (day, week) => {
+		this.setState({ ...this.state, selectedDay: day, selectedWeek: week });
 	};
 	selectMonth = index => {
 		this.calendar.current.scrollToIndex({ index: index });
-		this.setState({ ...this.state, selected: index });
+		this.setState({ ...this.state, selectedMonth: index });
 	};
 	updateMonthOnView = ({ viewableItems, changed }) => {
 		for (ch of changed) {
 			if (ch.isViewable) {
 				this.setState({
 					...this.state,
-					selected: ch.index
+					selectedMonth: ch.index
 				});
 				break;
 			}
 		}
 	};
+	monthKeyExtractor = (item, id) => {
+		return item.format("MMMM YYYY");
+	};
 	render() {
-		const monthSelected = this.state.months[this.state.selected];
+		const monthSelected = this.state.months[this.state.selectedMonth];
 		return (
-			<View style={styles.container}>
+			<View style={this.props.style}>
 				<MonthHeader
-					i={this.state.selected}
+					style={{ flex: 0 }}
+					i={this.state.selectedMonth}
 					name={monthSelected.format("MMMM [del] YYYY")}
 					change={this.selectMonth}
+					showDays={this.showDays}
+					enableChange={!this.state.selectedDay}
 				/>
-				<WeekDays />
-				<FlatList
-					ref={this.calendar}
-					viewabilityConfig={this.viewabilityConfig}
-					pagingEnabled={true}
-					horizontal={true}
-					data={this.state.months}
-					keyExtractor={this.monthKeyExtractor}
-					renderItem={({ item }) => {
-						return (
-							<Month key={item.format("MMMM YYYY")} date={item} />
-						);
-					}}
-					onViewableItemsChanged={this.updateMonthOnView}
-				/>
+				<WeekDays style={{ flex: 0 }} />
+				{!this.state.selectedDay && (
+					<FlatList
+						style={{ flex: 1 }}
+						ref={this.calendar}
+						getItemLayout={(data, index) => ({
+							length: width,
+							offset: width * index,
+							index
+						})}
+						initialScrollIndex={this.state.selectedMonth}
+						viewabilityConfig={this.viewabilityConfig}
+						pagingEnabled={true}
+						horizontal={true}
+						data={this.state.months}
+						keyExtractor={this.monthKeyExtractor}
+						renderItem={({ item }) => {
+							return (
+								<Month
+									key={item.format("MMMM YYYY")}
+									date={item}
+									selectDay={this.selectDay}
+								/>
+							);
+						}}
+						onViewableItemsChanged={this.updateMonthOnView}
+					/>
+				)}
+				{this.state.selectedDay && (
+					<Schedule
+						style={{ flex: 1 }}
+						week={this.state.selectedWeek}
+						day={this.state.selectedDay}
+						selectDay={this.selectDay}
+					/>
+				)}
 			</View>
 		);
 	}
 }
 
-const MonthHeader = ({ i, name, change }) => {
+const MonthHeader = ({ i, name, change, showDays, enableChange, style }) => {
 	return (
-		<View style={{ alignItems: "center", padding: 10 }}>
-			{i === 1 && (
+		<View style={{ ...style, alignItems: "center", padding: 10 }}>
+			{enableChange && i === 1 && (
 				<TouchableHighlight
 					style={{ position: "absolute", left: 0, padding: 10 }}
 					activeOpacity={0.5}
@@ -87,12 +128,24 @@ const MonthHeader = ({ i, name, change }) => {
 					<Icon name="chevron-thin-left" size={20} color="#ccc" />
 				</TouchableHighlight>
 			)}
-			<Text
-				style={{ color: "#000000", fontWeight: "bold", fontSize: 18 }}
+			<TouchableHighlight
+				activeOpacity={0.5}
+				underlayColor="transparent"
+				onPress={() => {
+					showDays(i);
+				}}
 			>
-				{name}
-			</Text>
-			{i === 0 && (
+				<Text
+					style={{
+						color: "#000000",
+						fontWeight: "bold",
+						fontSize: 18
+					}}
+				>
+					{name}
+				</Text>
+			</TouchableHighlight>
+			{enableChange && i === 0 && (
 				<TouchableHighlight
 					style={{ position: "absolute", right: 0, padding: 10 }}
 					activeOpacity={0.5}
@@ -110,9 +163,9 @@ const MonthHeader = ({ i, name, change }) => {
 
 const days = ["Dom", "Lun", "Mar", "Mie", "Jue", "Vie", "Sáb"];
 
-const WeekDays = () => {
+const WeekDays = ({ style }) => {
 	return (
-		<View style={{ flexDirection: "row", padding: 10 }}>
+		<View style={{ ...style, flexDirection: "row", padding: 10 }}>
 			{days.map(day => (
 				<Text key={day} style={{ flex: 1, fontSize: 18 }}>
 					{day}
@@ -121,10 +174,3 @@ const WeekDays = () => {
 		</View>
 	);
 };
-
-const styles = StyleSheet.create({
-	container: {
-		flex: 1,
-		backgroundColor: "#FFFFFF"
-	}
-});
