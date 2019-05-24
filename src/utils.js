@@ -8,9 +8,9 @@ export const getMonthWeeks = date => {
 		.day(0);
 	const weeks = [];
 	do {
-		const week = [];
+		const week = { id: `${monthNumber}-${weeks.length}`, days: [] };
 		for (let i = 0; i < 7; i++) {
-			week.push(
+			week.days.push(
 				momentCursor.month() === monthNumber
 					? moment(momentCursor)
 					: null

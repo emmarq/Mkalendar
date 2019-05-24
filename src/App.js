@@ -10,7 +10,7 @@ import React, { Component } from "react";
 import { StyleSheet, Text, View, Alert } from "react-native";
 import Header from "./Header";
 import Avatar from "./Avatar";
-import Calendar from "./Calendar";
+import Calendar from "./Calendar/Calendar";
 
 type Props = {};
 export default class App extends Component<Props> {
